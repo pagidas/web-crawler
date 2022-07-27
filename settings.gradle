@@ -1,2 +1,3 @@
 rootProject.name = 'web-crawler'
+include 'domain', 'demo'
 
