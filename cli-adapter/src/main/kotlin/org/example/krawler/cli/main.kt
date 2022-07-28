@@ -63,6 +63,7 @@ class Krawler: CliktCommand(
         println("== Initiating crawler with configuration ==\n${config.toStdOutFormat()}")
         val crawler = WebCrawler(config)
         crawler()
+        exitProcess(0)
     }
 }
 
