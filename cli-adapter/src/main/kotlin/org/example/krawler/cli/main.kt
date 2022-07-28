@@ -1,6 +1,8 @@
 package org.example.krawler.cli
 
 import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.core.context
+import com.github.ajalt.clikt.output.CliktHelpFormatter
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.validate
 import com.github.ajalt.clikt.parameters.options.*
@@ -9,15 +11,20 @@ import org.example.krawler.domain.ScrappingConfig
 import org.example.krawler.domain.WebCrawler
 import java.net.URI
 import java.net.URL
+import kotlin.system.exitProcess
 
-class Krawler: CliktCommand(help = """
+class Krawler: CliktCommand(
+    help = """
     Given BASEURI, this script crawls into the website and visits each 
     url it finds on the same domain, printing them.
     
     BASEURI must be a valid absolute url.
-""".trimIndent()) {
+    """.trimIndent(),
+    printHelpOnEmptyArgs = true
+) {
 
     init {
+        context { helpFormatter = CliktHelpFormatter(showDefaultValues = true) }
         versionOption("0.0.1")
     }
 
@@ -30,7 +37,10 @@ class Krawler: CliktCommand(help = """
 
     private val ignoredExtensions: List<String> by option(help = "List of ignored extensions to crawl to.")
         .split(",")
-        .default(listOf(".pdf", ".mp3", ".mp4", ".m4a", ".jpg", ".png", ".gif"))
+        .default(
+            value = listOf(".pdf", ".mp3", ".mp4", ".m4a", ".jpg", ".png", ".gif"),
+            defaultForHelp = ".pdf,.mp3,.mp4,.m4a,.jpg,.png,.gif"
+        )
         .validate {
             require(it.all { ext -> ext.contains(".") }) {
                 "Extension should be of this form: e.g. '.pdf'"
@@ -39,7 +49,10 @@ class Krawler: CliktCommand(help = """
 
     private val validSchemes: List<String> by option(help = "List of valid schemes in uri protocol for crawling.")
         .split(",")
-        .default(listOf("http", "https"))
+        .default(
+            value = listOf("http", "https"),
+            defaultForHelp = "http,https"
+        )
 
     private val maxConcurrentRequests: Int by option(help = "Max concurrent requests for crawler.")
         .int()
